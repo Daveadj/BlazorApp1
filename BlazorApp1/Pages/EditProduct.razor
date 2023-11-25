@@ -1,0 +1,52 @@
+﻿@page "/edit-product/{productId:int}"
+
+
+
+
+<h3>EditProduct</h3>
+
+
+<div class="container">
+    <div class="row">
+        <div class="card">
+            <div class="card-header">Add Product</div>
+            <div class="card-body">
+                <EditForm Model="Product" OnValidSubmit="UpdateProduct">
+                    <DataAnnotationsValidator />
+                    <div class="form-group">
+                        <label class="form-label">Product Name</label>
+                        <InputText @bind-Value="Product.Name" class="form-control"></InputText>
+                        <ValidationMessage For="()=>Product.Name"></ValidationMessage>
+
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Product Quantity</label>
+                        <InputNumber @bind-Value="Product.quantity" class="form-control"></InputNumber>
+                        <ValidationMessage For="()=>Product.quantity"></ValidationMessage>
+
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </EditForm>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+@code {
+    [Parameter] public int productId { get; set; }
+    public Product Product { get; set; } = new();
+
+
+    private async void UpdateProduct()
+    {
+        await ProductRepo.Update(Product);
+        NavigationManager.NavigateTo("/products");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Product = await ProductRepo.GetByIdAsync(productId);
+    }
+}

@@ -1,0 +1,82 @@
+﻿@page "/products"
+
+<button class="btn btn-success" @onclick="NavigateToAddProduct">
+    Add
+</button>
+
+
+@if (ProductList == null)
+{
+    <div class="alert alert-info"> No Product Available</div>
+}
+else
+{
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Quantity</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in ProductList)
+            {
+                <tr>
+                    <td>@product.Id</td>
+                    <td>@product.Name</td>
+                    <td>@product.quantity</td>
+                    <td>
+                        <div>
+                            <button class="btn btn-primary" @onclick="()=>NavigateToEditProduct(product)">
+                                Edit
+                            </button>
+                            <button class="btn btn-primary" @onclick="()=> DeleteProduct(product)">
+                                Delete
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+   
+}
+
+
+
+@code {
+    private List<Product>? ProductList;
+    public Product Product { get; set; } = new();
+
+    private async Task LoadProducts()
+    {
+        ProductList = await ProductRepo.GetAllProducts();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProducts();
+    }
+
+    private void NavigateToAddProduct()
+    {
+        NavigationManager.NavigateTo("add-product");
+    }
+
+    private void NavigateToEditProduct(Product product)
+    {
+        NavigationManager.NavigateTo($"edit-product/{product.Id}");
+    }
+
+    private async void DeleteProduct(Product product)
+    {
+        await ProductRepo.Delete(product);
+        await LoadProducts();
+        StateHasChanged();
+
+    }
+
+}
